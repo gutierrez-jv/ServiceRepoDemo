@@ -88,3 +88,5 @@ if (await _context.Products.AnyAsync(p => p.Name == product.Name))
 13. Implemented the delete service interface on product service
 14. Moved some of the logics in Create method in the controller onto the service layer CreateAsync method.
 15. Same case I did in the Edit method, I moved some of the logic in the updateasync
+16. Implemented the Delete method in the ProductService.cs
+
