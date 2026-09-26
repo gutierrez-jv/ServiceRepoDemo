@@ -9,6 +9,7 @@ public interface IProductService
     Task<Product?> GetByIdAsync(int id);
     Task<ServiceResult> CreateAsync(Product product);
     Task<ServiceResult> UpdateAsync(Product product);
+    Task<ServiceResult> DeleteAsync(int id);
 }
 
 public record ServiceResult(bool Success, string? Error = null)

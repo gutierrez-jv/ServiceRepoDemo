@@ -27,7 +27,7 @@
                 <td class="text-end">@p.Price.ToString("C")</td>
                 <td class="text-end">@p.Stock</td>
                 <td class="text-end">
-                    <a asp-action="Edit" asp-route-productId="@p.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
                     <a asp-action="Delete" asp-route-id="@p.Id" class="btn btn-sm btn-outline-danger">Delete</a>
                 </td>
             </tr>

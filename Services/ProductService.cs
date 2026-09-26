@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using ServiceRepoDemo.Data;
 using ServiceRepoDemo.Models;
 using ServiceRepoDemo.Repositories;
@@ -8,9 +9,9 @@ public class ProductService : IProductService
 {
     private readonly IProductRepository _repository;
 
-    public ProductService(AppDbContext context)
+    public ProductService(IProductRepository repository)
     {
-        _repository = new ProductRepository(context);
+        _repository = repository;
     }
 
     public Task<IEnumerable<Product>> GetAllAsync() => _repository.GetAllAsync();
@@ -19,6 +20,14 @@ public class ProductService : IProductService
 
     public async Task<ServiceResult> CreateAsync(Product product)
     {
+        product.Name = product.Name?.Trim();
+        var products = await _repository.GetAllAsync();
+
+        if (products.Any(p => p.Name == product.Name))
+        {
+            return ServiceResult.Fail($"A product named '{product.Name}' already exists.");
+        }
+        product.CreatedAt = DateTime.UtcNow;
         await _repository.AddAsync(product);
         await _repository.SaveChangesAsync();
         return ServiceResult.Ok();
@@ -27,8 +36,16 @@ public class ProductService : IProductService
     public async Task<ServiceResult> UpdateAsync(Product product)
     {
         var existing = await _repository.GetByIdAsync(product.Id);
+
         if (existing is null)
             return ServiceResult.Fail("Product not found.");
+        product.Name = product.Name?.Trim();
+        var products = await _repository.GetAllAsync();
+
+        if (products.Any(p => p.Name == product.Name && p.Id != product.Id))
+        {
+            return ServiceResult.Fail($"A product named '{product.Name}' already exists.");
+        }
 
         existing.Name = product.Name;
         existing.Description = product.Description;
@@ -36,8 +53,13 @@ public class ProductService : IProductService
         existing.Stock = product.Stock;
         existing.CreatedAt = product.CreatedAt;
 
-        _repository.Update(product);
+        _repository.Update(existing);
         await _repository.SaveChangesAsync();
         return ServiceResult.Ok();
+    }
+
+    public Task<ServiceResult> DeleteAsync(int id)
+    {
+        throw new NotImplementedException();
     }
 }

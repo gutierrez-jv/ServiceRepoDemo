@@ -8,8 +8,6 @@ namespace ServiceRepoDemo.Controllers;
 
 public class ProductsController : Controller
 {
-    private static List<Product>? _cache;
-
     private readonly IProductService _productService;
     private readonly AppDbContext _context;
 
@@ -21,8 +19,8 @@ public class ProductsController : Controller
 
     public async Task<IActionResult> Index()
     {
-        _cache ??= await _context.Products.OrderBy(p => p.Name).ToListAsync();
-        return View(_cache);
+        var products = await _context.Products.OrderBy(p => p.Name).ToListAsync();
+        return View(products);
     }
 
     public IActionResult Create() => View(new Product());
@@ -31,15 +29,6 @@ public class ProductsController : Controller
     public async Task<IActionResult> Create(Product product)
     {
         if (!ModelState.IsValid) return View(product);
-
-        if (await _context.Products.AnyAsync(p => p.Name == product.Name))
-        {
-            ModelState.AddModelError(string.Empty, $"A product named '{product.Name}' already exists.");
-            return View(product);
-        }
-
-        product.Name = product.Name.Trim();
-        product.CreatedAt = DateTime.UtcNow;
 
         var result = await _productService.CreateAsync(product);
         if (!result.Success)
@@ -72,7 +61,7 @@ public class ProductsController : Controller
         }
 
         TempData["Message"] = "Product updated.";
-        return View(product);
+        return RedirectToAction(nameof(Index));
     }
 
     public async Task<IActionResult> Delete(int id)

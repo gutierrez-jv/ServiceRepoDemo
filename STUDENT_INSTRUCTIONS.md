@@ -63,6 +63,28 @@ become visible after you fix another one, so re-test after every change.
   name, stock of 0 vs. 1, refreshing a page after saving.
 - For each bug you fix, write down the file, what was wrong, the symptom, and your fix.
 
+
+Im at the number 5
+
 1. I installed dotnet ef to update the database and changed the connection strings.
 2. On ProductRepository.cs, I removed the _context.ChangeTracker.Clear(); as this deletes the entity to be saved into the db.
-1. 
+3. Changed the Index wherein it only returns cached meaning it is not reflective of what is in the database.
+4. Changed the DI in Product service
+5. Changed the form asp-action into Edit in Edit views
+6. Also changed the asp-route-productId into asp-route-id to match what the controller
+7. In ProductService.cs I changed the _repository.Update(product) into _repository.Update(existing) 
+   which removed the another instance with the same key value for {'Id'} is already being tracked.
+8. In the ProductsController, I changed the return of the Edit method into return RedirectToAction(nameof(Index));
+   This is so that it goes back to index after update.
+9. I added this condition in controller in Edit method so that it checks for duplicate entries
+if (await _context.Products.AnyAsync(p => p.Name == product.Name))
+        {
+            ModelState.AddModelError(string.Empty, $"A product named '{product.Name}' already exists.");
+            return View(product);
+        }
+10. Added trimming on Edit in the controller so that leading and trailing whitespaces are removed
+11. In _Forms.cshtml, I updated the stock so that it correctly updates and saves in the database.
+12. Added the Delete interface in the IProductService
+13. Implemented the delete service interface on product service
+14. Moved some of the logics in Create method in the controller onto the service layer CreateAsync method.
+15. Same case I did in the Edit method, I moved some of the logic in the updateasync
