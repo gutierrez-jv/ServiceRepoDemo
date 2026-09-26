@@ -76,12 +76,6 @@ public class ProductsController : Controller
         var product = await _context.Products.FindAsync(id);
         if (product is null) return NotFound();
 
-        if (product.Stock >= 0)
-        {
-            TempData["Message"] = "Cannot delete a product that still has stock.";
-            return RedirectToAction(nameof(Index));
-        }
-
         _context.Products.Remove(product);
         await _context.SaveChangesAsync();
 
